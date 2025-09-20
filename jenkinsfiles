@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    
+    parameters {
+        string(name: 'NUM1', defaultValue: '1', description: 'First number')
+        string(name: 'NUM2', defaultValue: '2', description: 'Second number')
+        choice(name: 'OPERATION', choices: ['add', 'subtract', 'multiply', 'divide'], description: 'Choose an operation')
+    }
+
+    triggers {
+        cron('* * * * *')  // checks Git every 1 minutes
+        githubPush()   // 🔔 Trigger build on GitHub push
+    
+    }
+    
+    
+    stages {
+        stage('Git Clone') {
+            steps {
+                git branch: 'main', url: 'https://github.com/22110022-blip/CalculatorApp.git'
+            }
+        }
+        stage('Run App') {
+            steps {
+                sh "python3 calculator.py ${params.NUM1} ${params.NUM2} '${params.OPERATION}'"
+            }
+        }
+    }
+}
